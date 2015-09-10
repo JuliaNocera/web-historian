@@ -1,6 +1,7 @@
 var path = require('path');
 var fs = require('fs');
 var archive = require('../helpers/archive-helpers');
+var request = require('request');
 
 exports.headers = headers = {
   "access-control-allow-origin": "*",
@@ -12,8 +13,23 @@ exports.headers = headers = {
 exports.statusCode = statusCode = 200;
 
 exports.serveAssets = serveAssets = function(res, asset, contentType) {
-  this.headers['Content-type'] = contentType;
+  headers['Content-type'] = contentType;
   res.writeHead(statusCode, headers);
+  res.end(asset);
+};
+
+exports.redirect = redirect = function(res, url) {
+  // headers["Location"] = url;
+  // res.writeHead(302, {Location: url});
+  console.log('redirecting...');
+  res.statusCode = 302;
+  res.setHeader('Location', url);
+  res.end();
+};
+
+exports.serveRedirect = serveRedirect = function(res, asset, contentType) {
+  headers['Content-type'] = contentType;
+  res.writeHead(302, headers);
   res.end(asset);
 };
 
@@ -48,8 +64,10 @@ exports.addUrlToList = addUrlToList = function(site, res) {
     } else {
       //load the 'loading' page
       //get and load actual page using res
-        res.writeHead(201, headers);
-        res.end();
+        console.log("site added to list")
+        serveRedirect(res, '/loading.html');
+        // res.writeHead(201, headers);
+        // res.end();
     }
   });
 }; 
@@ -67,10 +85,20 @@ exports.readListOfUrls = readListOfUrls = function(site, res){
 exports.isUrlInList = isUrlInList = function(data, site, res){
   listOfSites = data.split('\n');
   if (listOfSites.indexOf(site) >= 0) {
-    // load sire from archive
+    downloadUrls(site);
     console.log('site found');
   } else {
     addUrlToList(site, res);
   }
+};
+
+exports.downloadUrls = downloadUrls = function(url){
+  var url = 'http://' + JSON.parse(url);
+  console.log(url);
+  request(url, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      console.log(body); // Show the HTML for the Google homepage. 
+    }
+  });
 };
 // As you progress, keep thinking about what helper functions you can put here!

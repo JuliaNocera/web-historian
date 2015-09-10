@@ -6,6 +6,7 @@ var helpers = require('./http-helpers');
 
 exports.handleRequest = function (req, res) {
   console.log('handle request triggered');
+  console.log(req.url);
   var location = req.url.split('/');
   if(location.length >= 2){
     if(req.method === 'GET'){
@@ -21,12 +22,14 @@ exports.handleRequest = function (req, res) {
       if(location[1] === 'jquery.min.js'){
         helpers.getFile(res, './public/jquery.min.js', 'text/javascript');
       }
+      if(location[1] === 'loading.html'){
+        helpers.serveRedirect(res, './public/loading.html', 'text/html');
+      }
     }
     if (req.method === 'POST') {
       console.log('post received by server');
       helpers.processPost(req, res);
-    }
-    
+    } 
   }
   //res.end(archive.paths.list);
 };
