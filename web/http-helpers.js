@@ -32,17 +32,16 @@ exports.processPost = processPost = function(req, res) {
   req.on('data', function(chunk) {
     body += chunk;
   });
-  req.on('end', function(body) {
+  req.on('end', function() {
     // check if in sites file already
      // if yes, load latest archived version of site
     // else
-    console.log(body)
-    addToIndex(body, res);  
+    addUrlToList(body, res);  
   });
 };
 
-exports.addToIndex = addToIndex = function(site, res) {
-  fs.appendFile('./archives/sites.txt', site, function(err) {
+exports.addUrlToList = addUrlToList = function(site, res) {
+  fs.appendFile('./archives/sites.txt', site + '\n', function(err) {
     if (err) {
       throw 'site not added to index';
     } else {
