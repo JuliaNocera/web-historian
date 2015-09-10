@@ -27,7 +27,7 @@ exports.getFile = getFile = function(res, file, contentType) {
   });
 };
 
-exports.processPost = processPost = function(req) {
+exports.processPost = processPost = function(req, res) {
   var body = '';
   req.on('data', function(chunk) {
     body += chunk;
@@ -36,11 +36,12 @@ exports.processPost = processPost = function(req) {
     // check if in sites file already
      // if yes, load latest archived version of site
     // else
-    addToIndex(body);  
+    console.log(body)
+    addToIndex(body, res);  
   });
 };
 
-exports.addToIndex = addToIndex = function(site) {
+exports.addToIndex = addToIndex = function(site, res) {
   fs.appendFile('./archives/sites.txt', site, function(err) {
     if (err) {
       throw 'site not added to index';
