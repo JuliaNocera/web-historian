@@ -28,15 +28,16 @@ exports.getFile = getFile = function(res, file, contentType) {
 };
 
 exports.processPost = processPost = function(req, res) {
-  var body = '';
+  var site = '';
   req.on('data', function(chunk) {
-    body += chunk;
+    site += chunk;
   });
   req.on('end', function() {
     // check if in sites file already
      // if yes, load latest archived version of site
     // else
-    addUrlToList(body, res);  
+    // addUrlToList(body, res);  
+    readListOfUrls(site, res);
   });
 };
 
@@ -45,10 +46,31 @@ exports.addUrlToList = addUrlToList = function(site, res) {
     if (err) {
       throw 'site not added to index';
     } else {
-      res.writeHead(201, headers);
-      res.end();
+      //load the 'loading' page
+      //get and load actual page using res
+        res.writeHead(201, headers);
+        res.end();
     }
   });
 }; 
 
+exports.readListOfUrls = readListOfUrls = function(site, res){
+  fs.readFile('./archives/sites.txt', 'utf-8', function(err, data){
+    if(err){
+      throw "Cannot read list of URLs";
+    } else {
+      isUrlInList(data, site, res);
+    }
+  });
+};
+
+exports.isUrlInList = isUrlInList = function(data, site, res){
+  listOfSites = data.split('\n');
+  if (listOfSites.indexOf(site) >= 0) {
+    // load sire from archive
+    console.log('site found');
+  } else {
+    addUrlToList(site, res);
+  }
+};
 // As you progress, keep thinking about what helper functions you can put here!
