@@ -93,11 +93,17 @@ exports.isUrlInList = isUrlInList = function(data, site, res){
 };
 
 exports.downloadUrls = downloadUrls = function(url){
-  var url = 'http://' + JSON.parse(url);
-  console.log(url);
-  request(url, function (error, response, body) {
+  url = JSON.parse(url);
+  var site = 'http://' + url;
+  request(site, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      console.log(body); // Show the HTML for the Google homepage. 
+      var fileLocation = './archives/sites/' + url + '.txt';
+      fs.writeFile(fileLocation, body, 'utf-8', 
+        function(err) {
+        if (err) {
+          throw 'url not written to file';
+        }
+      }); 
     }
   });
 };
