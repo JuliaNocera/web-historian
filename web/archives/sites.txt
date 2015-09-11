@@ -1,5 +1,7 @@
 "www.google.com"
+"www.schepman.org"
 "www.amazon.com"
-"www.yahoo.com"
-"www.facebook.com"
+"hello.com"
 "www.hello.com"
+"www.google.cim"
+www.amazon.com

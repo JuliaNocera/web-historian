@@ -18,23 +18,18 @@ exports.serveAssets = serveAssets = function(res, asset, contentType) {
   res.end(asset);
 };
 
-exports.redirect = redirect = function(res, url) {
+exports.serveRedirect = serveRedirect = function(res, url) {
   // headers["Location"] = url;
-  // res.writeHead(302, {Location: url});
-  console.log('redirecting...');
-  res.statusCode = 302;
-  res.setHeader('Location', url);
+  // console.log('redirecting...');
+  // res.statusCode = 302;
+  // res.setHeader('Location', url);
+  res.writeHead(302, {Location: url});
   res.end();
-};
-
-exports.serveRedirect = serveRedirect = function(res, asset, contentType) {
-  headers['Content-type'] = contentType;
-  res.writeHead(302, headers);
-  res.end(asset);
 };
 
 exports.getFile = getFile = function(res, file, contentType) {
   fs.readFile(file, 'utf-8', function(err, data) {
+    console.log('file: ', file);
     if (err) {
       throw 'file not loaded';
     } else {
@@ -49,11 +44,7 @@ exports.processPost = processPost = function(req, res) {
     site += chunk;
   });
   req.on('end', function() {
-    // check if in sites file already
-     // if yes, load latest archived version of site
-    // else
-    // addUrlToList(body, res);  
-    readListOfUrls(site, res);
+    readListOfUrls(JSON.parse(site), res);
   });
 };
 
@@ -62,12 +53,7 @@ exports.addUrlToList = addUrlToList = function(site, res) {
     if (err) {
       throw 'site not added to index';
     } else {
-      //load the 'loading' page
-      //get and load actual page using res
-        console.log("site added to list")
-        serveRedirect(res, '/loading.html');
-        // res.writeHead(201, headers);
-        // res.end();
+      serveRedirect(res, '/loading.html');
     }
   });
 }; 
@@ -85,7 +71,8 @@ exports.readListOfUrls = readListOfUrls = function(site, res){
 exports.isUrlInList = isUrlInList = function(data, site, res){
   listOfSites = data.split('\n');
   if (listOfSites.indexOf(site) >= 0) {
-    downloadUrls(site);
+    var site = './archives/sites/' + site + '.html';
+    serveRedirect(res, site);
     console.log('site found');
   } else {
     addUrlToList(site, res);
@@ -97,7 +84,7 @@ exports.downloadUrls = downloadUrls = function(url){
   var site = 'http://' + url;
   request(site, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      var fileLocation = './archives/sites/' + url + '.txt';
+      var fileLocation = './archives/sites/' + url + '.html';
       fs.writeFile(fileLocation, body, 'utf-8', 
         function(err) {
         if (err) {
